@@ -1,28 +1,29 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import { Client } from 'boardgame.io/react';
+import { Game } from 'boardgame.io/core';
+import monsters from './pre-decks/monsters';
+import deckCreator from './decks/deck-creator';
+import barbarianDeck from './decks/barbarianDeck';
+
 import './App.css';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
-}
+const WTTD = Game({
+  setup : () => ({
+    mDeck : deckCreator(monsters),
+    heroItems : barbarianDeck
+  })
+});
+
+// class App extends Component {
+//   render() {
+//     let monsterDeck = deckCreator(monsters);
+//     console.log(monsterDeck);
+//     return (
+//       <h1>Welcome to the Dungeon</h1>
+//     );
+//   }
+// }
+
+const App = Client({ game: WTTD, numPlayers : 4 });
 
 export default App;
