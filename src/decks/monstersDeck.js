@@ -1,4 +1,6 @@
-const Monsters = [
+import { addIds, expandMultiples } from './deck-creator';
+
+const MonstersPreDeck = [
   {
     name : "Goblin",
     strength : 1,
@@ -41,4 +43,6 @@ const Monsters = [
   }
 ];
 
-export default Monsters;
+const MonstersDeck = addIds(expandMultiples(MonstersPreDeck));
+
+export default MonstersDeck;

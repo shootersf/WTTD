@@ -1,4 +1,6 @@
-const BarbarianDeck = [
+import { addIds } from './deck-creator';
+
+const BarbarianPreDeck = [
   {
     name : "Healing Potion"
   },
@@ -18,5 +20,7 @@ const BarbarianDeck = [
     name : "War Hammer"
   }
 ];
+
+const BarbarianDeck = addIds(BarbarianPreDeck);
 
 export default BarbarianDeck;
