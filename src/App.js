@@ -5,12 +5,22 @@ import monstersDeck from './decks/monstersDeck';
 import barbarianDeck from './decks/barbarianDeck';
 
 import './App.css';
+import { TurnOrder } from 'boardgame.io/dist/core';
+
+//Turn order from custom not working 
+function getNextPlayer(currentPlayer, activePlayers) {
+  const currentIndex = activePlayers.indexOf(parseInt(currentPlayer));
+  const next = (currentIndex === activePlayers.length - 1) ? activePlayers[0] : activePlayers[currentIndex + 1];
+  //console.log({currentPlayer, activePlayers, currentIndex, next});
+
+  return next.toString();
+}
 
 const WTTD = Game({
   name : "Welcome to the Dungeon",
 
   setup : (ctx) => ({
-    mDeck : monstersDeck,
+    mDeck : ctx.random.Shuffle(monstersDeck),
     heroItems : barbarianDeck,
     hero : {name : "Barbarian", hp : 4},
     dungeon : [],
@@ -24,6 +34,9 @@ const WTTD = Game({
     drawCard(G, ctx) {
       // Test to make sure there is a card to draw and that there is no active card
       if(G.mDeck.length > 0 && Object.keys(G.activeCard).length === 0) {
+        // Move to decision phase in preperation
+        ctx.events.endPhase({next : 'PD_placeOrDiscard'});
+
         // Move the top card into the active card slot
         return {...G, activeCard : G.mDeck[0], mDeck : G.mDeck.slice(1)}
 
@@ -32,23 +45,66 @@ const WTTD = Game({
       }
     },
     passTurn(G, ctx)  {
-      return {...G, activePlayersInRound : G.activePlayersInRound.filter(id => id != ctx.currentPlayer)}
+      // Prepare new G
+      const newG = {...G, activePlayersInRound : G.activePlayersInRound.filter(id => id != ctx.currentPlayer)};
+  
+      // Determine next Phase
+      const next= (newG.activePlayersInRound.length > 1) ? 'PD_drawOrPass' : 'EnterDungeon';
+
+      //DEBUG: 
+      if (next === 'EnterDungeon') console.log("YOU ARE AT THE DUNGEON");
+
+      // Move Phase
+      ctx.events.endPhase({next});
+
+      // End player turn
+      ctx.events.endTurn( {next : getNextPlayer(ctx.currentPlayer, [...G.activePlayersInRound]) });
+
+      return newG;
     },
     // Moves active card to the dungeon deck
     addCardToDungeon(G, ctx) {
       // Test for active card
       if(Object.keys(G.activeCard).length > 0) {
+
+        // Move Phase
+        ctx.events.endPhase({next : 'PD_drawOrPass'});
+
+      // End player turn
+      ctx.events.endTurn( {next : getNextPlayer(ctx.currentPlayer, [...G.activePlayersInRound]) });
+
         return {...G, dungeon : [G.activeCard, ...G.dungeon], activeCard : {}}
       }
     },
     discardEquipment(G, ctx, itemId) {
       //TODO: check that item is in stack
 
-      //Return stack minus item
-      return {...G, heroItems : G.heroItems.filter(item => item.id !== itemId)};
+      // Move Phase
+      ctx.events.endPhase({next : 'PD_drawOrPass'});
+
+      // End player turn
+      ctx.events.endTurn( {next : getNextPlayer(ctx.currentPlayer, [...G.activePlayersInRound]) });
+
+      //Return stack minus item and discard active card
+      return {...G, heroItems : G.heroItems.filter(item => item.id !== itemId), activeCard : {}};
     }
   },
 
+  flow : {
+    startingPhase : 'PD_drawOrPass',
+
+    phases : {
+      PD_drawOrPass : {
+        allowedMoves : ['drawCard', 'passTurn']
+      },
+      PD_placeOrDiscard : {
+        allowedMoves : ['addCardToDungeon', 'discardEquipment']
+      },
+      EnterDungeon : {
+
+      }
+    }
+  }
   
 });
 
