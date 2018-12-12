@@ -5,7 +5,6 @@ import monstersDeck from './decks/monstersDeck';
 import barbarianDeck from './decks/barbarianDeck';
 
 import './App.css';
-import { TurnOrder } from 'boardgame.io/dist/core';
 
 //Turn order from custom not working 
 function getNextPlayer(currentPlayer, activePlayers) {
