@@ -1,3 +1,4 @@
+// Takes in a deck of cards with multiples and makes copies discarding the "qty" attribute
 export function expandMultiples(preDeck) {
   let deck = [];
 
@@ -12,6 +13,7 @@ export function expandMultiples(preDeck) {
   return deck;
 }
 
+// Adds an id to each card in a deck starting at 0
 export function addIds(preDeck) {
   let id = 0;
   let deck = [];
