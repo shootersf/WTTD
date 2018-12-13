@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import StartNewGame from './boardComponents/StartNewGame';
 import StartNewTurn from './boardComponents/StartNewTurn';
+import BoardInfo from './boardComponents/BoardInfo';
 
 export class WTTDBoard extends Component {
 
@@ -25,6 +26,7 @@ export class WTTDBoard extends Component {
   
   render() {
     let output;
+    const currentPhase = this.props.ctx.phase;
 
     if (!this.props.started) {
       // set screen to show start game screen
@@ -34,6 +36,9 @@ export class WTTDBoard extends Component {
     else if (this.state.startOfTurn) {
       output = (<StartNewTurn currentPlayer={this.props.ctx.currentPlayer} newTurnStarted={this.newTurnStarted.bind(this)} />);
     }
+    // If still in dungeon prop
+    else if (currentPhase === 'PD_drawOrPass' || currentPhase === 'PD_placeOrDiscard')
+      output = (<BoardInfo G={this.props.G} ctx={this.props.ctx} moves={this.props.moves} />)
 
     return (
       // Due to debugger temp put everything to the left

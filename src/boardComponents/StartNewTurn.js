@@ -6,7 +6,7 @@ export default function StartNewTurn(props) {
       
           <h2 className="mb-4">Ready when you are Player {props.currentPlayer + 1}</h2>
           
-          <button className="btn btn-primary" onClick={props.gameHasStarted}>START TURN!</button>
+          <button className="btn btn-primary" onClick={props.newTurnStarted}>START TURN!</button>
     </div>
   )
 }
