@@ -6,7 +6,7 @@ export default function HeroInfo(props) {
   return (
     <div>
       <h3>{name}</h3>
-      <ul>
+      <ul className="list-unstyled ml-3">
         <li>Starting HP: {startHP}</li>
         <li>Total HP: {totalHP}</li>
       </ul>
