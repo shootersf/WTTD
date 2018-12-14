@@ -44,13 +44,10 @@ export const WTTD = Game({
       const newG = {...G, activePlayersInRound : G.activePlayersInRound.filter(id => id != ctx.currentPlayer)};
   
       // Determine next Phase
-      const next= (newG.activePlayersInRound.length > 1) ? 'PD_drawOrPass' : 'EnterDungeon';
-
-      //DEBUG: 
-      if (next === 'EnterDungeon') console.log("YOU ARE AT THE DUNGEON");
+      // const next= (newG.activePlayersInRound.length > 1) ? 'PD_drawOrPass' : 'EnterDungeon';
 
       // Move Phase
-      ctx.events.endPhase({next});
+      ctx.events.endPhase({next : 'PD_drawOrPass'});
 
       // End player turn
       ctx.events.endTurn( {next : getNextPlayer(ctx.currentPlayer, [...G.activePlayersInRound]) });

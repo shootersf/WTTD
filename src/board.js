@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import StartNewGame from './boardComponents/StartNewGame';
 import StartNewTurn from './boardComponents/StartNewTurn';
-import BoardInfo from './boardComponents/BoardInfo';
+import DungeonPreparer from './boardComponents/DungeonPreparer';
 
 export class WTTDBoard extends Component {
 
@@ -38,13 +38,13 @@ export class WTTDBoard extends Component {
     }
     // If still in dungeon prop
     else if (currentPhase === 'PD_drawOrPass' || currentPhase === 'PD_placeOrDiscard')
-      output = (<BoardInfo G={this.props.G} ctx={this.props.ctx} moves={this.props.moves} />)
+      output = (<DungeonPreparer G={this.props.G} ctx={this.props.ctx} moves={this.props.moves} />)
 
     return (
       // Due to debugger temp put everything to the left
       <div className="container">
         <div className="row">
-          <div className="col-8">
+          <div className="col-10">
             {output}
           </div>
         </div>

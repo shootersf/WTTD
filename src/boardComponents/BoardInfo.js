@@ -8,21 +8,26 @@ import CardsInfo from './boardInfoComponents/CardsInfo';
 export default function BoardInfo(props) {
   const {activeCard, activePlayersInRound, dungeon, hero, heroItems, mDeck, playerHealth, playerVictories} = props.G;
   const {currentPlayer} = props.ctx;
+  const selectingDiscard = props.selectingDiscard;
+  const setItemDiscardId = props.setItemDiscardId;
+  const discardIdSeclected = props.discardIdSeclected;
+
   const totalHP = getTotalHP(hero, heroItems);
+  
   return (
     <div className="container">
       <div className="row">
         <div className="col-sm-8">
           <HeroInfo name={hero.name} startHP={hero.hp} totalHP={totalHP} />
-          <ItemsInfo items={heroItems} />
+          <ItemsInfo items={heroItems} selectingDiscard={selectingDiscard} setItemDiscardId={setItemDiscardId} discardIdSeclected={discardIdSeclected}  />
         </div>
         <div className="col-sm-4">
           <PlayersInfo currentPlayer={currentPlayer} activePlayers={activePlayersInRound} playerHealth={playerHealth} playerVictories={playerVictories} />
         </div>
-        <div className="row">
-          <div className="col-sm-12">
-            <CardsInfo mDeck={mDeck} dungeon={dungeon} activeCard={activeCard} />
-          </div>
+      </div>
+      <div className="row">
+        <div className="col-sm-12">
+          <CardsInfo mDeck={mDeck} dungeon={dungeon} activeCard={activeCard} />
         </div>
       </div>
     </div>
