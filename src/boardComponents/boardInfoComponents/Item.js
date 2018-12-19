@@ -4,6 +4,8 @@ export default function Item(props) {
   const { item, selectingDiscard, setItemDiscardId, discardIdSeclected } = props;
 
   let className;
+
+  // Apply borders if player is selecting card to discard
   if (selectingDiscard && discardIdSeclected === item.id) {
     className = "col-sm-5 border border-warning my-2";
   }

@@ -11,6 +11,14 @@ function getNextPlayer(currentPlayer, activePlayers) {
   return next.toString();
 }
 
+function getTotalHP(hero, items) {
+  let hp = hero.hp;
+  const hpItems = items.filter(item => item.type === "Armour");
+  //return reduced hpItems with initial value of hp
+  return hpItems.reduce( ((acc, cur) => acc + cur.hpBuff), hp);
+
+}
+
 export const WTTD = Game({
   name : "Welcome to the Dungeon",
 
@@ -19,6 +27,7 @@ export const WTTD = Game({
     heroItems : barbarianDeck,
     hero : {name : "Barbarian", hp : 4},
     dungeon : [],
+    dungeonStats : {},
     activeCard : {},
     playerHealth : Array(ctx.numPlayers).fill(2),
     playerVictories : Array(ctx.numPlayers).fill(0),
@@ -41,6 +50,7 @@ export const WTTD = Game({
     },
     passTurn(G, ctx)  {
       // Prepare new G
+      // eslint-disable-next-line
       const newG = {...G, activePlayersInRound : G.activePlayersInRound.filter(id => id != ctx.currentPlayer)};
   
       // Determine next Phase
@@ -85,6 +95,59 @@ export const WTTD = Game({
         return INVALID_MOVE;
       }
       
+    },
+
+    killMonster(G, ctx, weaponID) {
+      const monster = G.activeCard;
+      const weapon = (weaponID) ? G.heroItems.find(item => item.id === weaponID) : null;
+      let newItems = G.heroItems;
+      let hp = G.dungeonStats.currentHP;
+      const remainingMonsters = G.dungeon.length;
+
+
+      // Make sure weapon is usable by checking that the hero has it and it can kill the monster
+      if(weaponID) {
+        const itemIds = G.heroItems.map(item => item.id);
+        
+        if (!itemIds.includes(weaponID) || !weapon.canKill(monster)) {
+          return INVALID_MOVE;
+        }
+      }
+
+      if(!weaponID) {
+        // reduce player HP
+        hp -= monster.strength;
+      }
+      else if(weapon.singleUse) {
+        // discard one time weapons
+        newItems = G.heroItems.filter(item => item.id !== weapon.id);
+      }
+
+      // Determine next phase
+      let next;
+
+      if (hp <= 0) {
+        // Dead
+        next = 'DungeonHeroDead';
+      }
+      else if (remainingMonsters === 0) {
+        next = 'DungeonCleared';
+      }
+      else {
+        next = 'DungeonRound';
+      }
+
+      // next phase
+      ctx.events.endPhase({ next });
+
+
+      return {...G,
+        heroItems : newItems, 
+        activeCard : {}, 
+        dungeonStats : {...G.dungeonStats, currentHP : hp },
+      };
+
+
     }
   },
 
@@ -98,9 +161,28 @@ export const WTTD = Game({
       PD_placeOrDiscard : {
         allowedMoves : ['addCardToDungeon', 'discardEquipment']
       },
-      EnterDungeon : {
+      PrepareDungeon : {
+        allowedMoves : [],
+        onPhaseBegin : (G, ctx) => {
+          const stats = {};
+          stats.maxHP = getTotalHP(G.hero, G.heroItems);
+          stats.currentHP = stats.maxHP;
+          return {...G, dungeonStats : {...stats}};
+        }
+      },
+      DungeonRound : {
+        allowedMoves : ['killMonster'],
+        onPhaseBegin : (G, ctx) => {
+          // Draw card from Dungeon Deck
+          return {...G, activeCard : G.dungeon[0], dungeon : G.dungeon.slice(1)};
+        }
+      },
+      DungeonHeroDead : {
 
-      }
+      },
+      DungeonCleared : {
+
+      },
     }
   }
   

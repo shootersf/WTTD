@@ -9,12 +9,20 @@ const BarbarianPreDeck = [
   {
     name : "Vorpal Axe",
     text : "Defeat any monster (one time use)",
-    type : "Weapon"
+    type : "Weapon",
+    singleUse : true,
+    canKill : function(monster) {
+      return true;
+    },
   },
   {
     name : "Torch",
     text : "Defeat any monsters of Strength 3 or less",
-    type : "Weapon"
+    type : "Weapon",
+    singleUse : false,
+    canKill : function(monster) {
+      return (monster.strength <= 3) ? true : false;
+    }
   },
   {
     name : "Leather Shield",
@@ -31,7 +39,11 @@ const BarbarianPreDeck = [
   {
     name : "War Hammer",
     text : "Defeat Golems (Strength: 5)",
-    type : "Weapon"
+    type : "Weapon",
+    singleUse : false,
+    canKill : function(monster) {
+      return (monster.name === 'Golem') ? true : false;
+    }
   }
 ];
 

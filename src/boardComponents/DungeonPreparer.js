@@ -5,16 +5,28 @@ import BoardInfo from './BoardInfo';
 export default class DungeonPreparer extends Component {
   constructor(props) {
     super(props);
-
+    // Keep track of highlighted item when choosing what one to discard
     this.state = {
       selectingDiscard : false,
       discardIdSeclected : null
     };
   }
+  // On Clicks
+  enterTheDungeon() {
+    // If there are cards in Dungeon enter, otherwise go to victory
+      if (this.props.G.dungeon.length > 0) {
+        this.props.events.endPhase({ next : 'DungeonRound' });
+      }
+      else {
+        //TODO: Victory
+      }
+  }
 
   setItemDiscardId(id) {
     this.setState({discardIdSeclected : id});
   }
+
+
   // Moves
   drawCard() {
     this.props.moves.drawCard();
@@ -38,24 +50,24 @@ export default class DungeonPreparer extends Component {
     this.setState({ selectingDiscard : false, discardIdSeclected : null});
   }
 
-  // Uses phase, state and players remaining to determine what buttons should be available
-  createPlayerOptions() {
-    const { phase } = this.props.ctx;
-    const { activePlayersInRound, mDeck } = this.props.G;
-    let options;
+  // Life cycle
+  componentDidUpdate(prevProps, prevState) {
 
     // If player is last active player prompt them to enter the dungeon
-    if (activePlayersInRound.length === 1) {
-      options = (
-        <div className="row">
-          <div className="col-sm-12 text-center">
-            <button className="btn btn-danger">ENTER THE DUNGEON</button>
-          </div>
-        </div>
-      );
+    if (this.props.G.activePlayersInRound.length === 1 && this.props.ctx.phase !== 'PrepareDungeon') {
+      // Change phase to preparing dungeon
+      this.props.events.endPhase({next : 'PrepareDungeon'});
     }
+  }
+
+  // Uses phase, and state to determine what buttons should be available
+  createPlayerOptions() {
+    const { phase } = this.props.ctx;
+    const { mDeck } = this.props.G; // cannot draw card if none available
+    let options;
+    
     // If draw phase
-    else if (phase === 'PD_drawOrPass') {
+    if (phase === 'PD_drawOrPass') {
       options = (
         <div className="row">
           <div className="col-sm-6 text-right">
@@ -88,7 +100,18 @@ export default class DungeonPreparer extends Component {
             <button className="btn btn-primary" onClick={this.addToDungeon.bind(this)}>Add Card To Dungeon</button>
           </div>
           <div className="col-sm-6">
+            {/* Only allow discard item if Hero still has some items */}
             <button className="btn btn-primary" onClick={this.startDiscard.bind(this)} disabled={(this.props.G.heroItems.length > 0) ? null : 'disabled'} >Discard Item</button>
+          </div>
+        </div>
+      );
+    }
+    // If preparing dungeon 
+    else if (phase === 'PrepareDungeon') {
+      options = (
+        <div className="row">
+          <div className="col-sm-12 text-center">
+            <button className="btn btn-danger" onClick={this.enterTheDungeon.bind(this)} >ENTER THE DUNGEON</button>
           </div>
         </div>
       );
